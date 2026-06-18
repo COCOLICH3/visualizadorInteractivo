@@ -11,6 +11,7 @@ export function createControlPanel(store, presetManager) {
       <select data-key="pattern">
         <option value="bars">Barras</option>
         <option value="particles">Partículas</option>
+        <option value="tunnel">Túnel 3D</option>
       </select>
     </label>
     <label>Paleta
@@ -46,7 +47,7 @@ export function createControlPanel(store, presetManager) {
 
   // Atajos de teclado.
   function cyclePattern() {
-    const order = ['bars', 'particles'];
+    const order = ['bars', 'particles', 'tunnel'];
     const cur = store.getState().pattern;
     const next = order[(order.indexOf(cur) + 1) % order.length];
     store.setState({ pattern: next });
