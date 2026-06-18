@@ -1,0 +1,12 @@
+{
+  "name": "visualizador-musica",
+  "version": "0.0.1",
+  "description": "Spike: captura del audio del sistema (loopback) + espectro simple",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^31.7.7"
+  }
+}
