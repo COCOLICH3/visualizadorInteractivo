@@ -20,4 +20,24 @@ describe('BeatDetector', () => {
     for (let i = 0; i < 10; i++) d.detect(0.1);
     expect(d.detect(0.11)).toBe(false); // 0.11 < 0.1*1.3
   });
+
+  it('el debounce ignora golpes demasiado seguidos', () => {
+    let clock = 1000;
+    const d = createBeatDetector({
+      historySize: 5,
+      sensitivity: 1.3,
+      debounceMs: 150,
+      now: () => clock,
+    });
+    for (let i = 0; i < 5; i++) d.detect(0.1); // llena el historial
+
+    clock = 2000;
+    expect(d.detect(0.5)).toBe(true); // primer golpe
+
+    clock = 2050; // solo 50ms después
+    expect(d.detect(0.5)).toBe(false); // debounce lo ignora
+
+    clock = 2200; // 200ms después del último golpe válido
+    expect(d.detect(0.5)).toBe(true); // pasó el debounce
+  });
 });
