@@ -50,6 +50,9 @@ startBtn.addEventListener('click', async () => {
   function loop() {
     engine.tick();
     const state = store.getState();
+    if (state.flash > 0) {
+      store.setState({ flash: Math.max(0, state.flash - 0.05) });
+    }
     if (state.autoPalette && state.autoPaletteMode === 'time') {
       autoTimer++;
       if (autoTimer > 300) { // ~5s a 60fps

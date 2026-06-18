@@ -69,6 +69,16 @@ export function createParticles() {
         p.g.alpha = Math.max(0, p.life);
         p.g.tint = colorAt(palette, p.life);
       }
+
+      if (!this._flash) {
+        this._flash = new PIXI.Graphics();
+        app.stage.addChild(this._flash);
+      }
+      this._flash.clear();
+      if (state.flash > 0) {
+        this._flash.rect(0, 0, app.renderer.width, app.renderer.height);
+        this._flash.fill({ color: 0xffffff, alpha: state.flash * 0.6 });
+      }
     },
 
     resize() {},
