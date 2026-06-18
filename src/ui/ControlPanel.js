@@ -12,6 +12,7 @@ export function createControlPanel(store, presetManager) {
         <option value="bars">Barras</option>
         <option value="particles">Partículas</option>
         <option value="tunnel">Túnel 3D</option>
+        <option value="nebulosa">Nebulosa</option>
       </select>
     </label>
     <label>Paleta
@@ -23,6 +24,12 @@ export function createControlPanel(store, presetManager) {
     <label>Suavizado <input type="range" data-key="smoothing" min="0" max="0.95" step="0.05"></label>
     <label>Partículas <input type="range" data-key="particleCount" min="100" max="2000" step="50"></label>
     <label><input type="checkbox" data-key="autoPalette"> Auto-paleta</label>
+    <fieldset class="trail">
+      <legend>Trail (Nebulosa)</legend>
+      <label>Escala <input type="range" data-key="trailScale" min="0.95" max="1.08" step="0.005"></label>
+      <label>Persistencia <input type="range" data-key="trailAlpha" min="0.7" max="0.995" step="0.005"></label>
+      <label>Rotación <input type="range" data-key="trailRotate" min="-0.02" max="0.02" step="0.001"></label>
+    </fieldset>
     <p class="hint">Atajos: [P] patrón · [C] paleta · [Espacio] flash · [F] fullscreen · [H] ocultar</p>
   `;
   document.body.appendChild(el);
@@ -47,7 +54,7 @@ export function createControlPanel(store, presetManager) {
 
   // Atajos de teclado.
   function cyclePattern() {
-    const order = ['bars', 'particles', 'tunnel'];
+    const order = ['bars', 'particles', 'tunnel', 'nebulosa'];
     const cur = store.getState().pattern;
     const next = order[(order.indexOf(cur) + 1) % order.length];
     store.setState({ pattern: next });

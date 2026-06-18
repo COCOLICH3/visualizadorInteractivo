@@ -10,6 +10,7 @@ import { createRenderer } from './render/Renderer.js';
 import { createSpectrumBars } from './visualizers/SpectrumBars.js';
 import { createParticles } from './visualizers/Particles.js';
 import { createTunnel3D } from './visualizers/Tunnel3D.js';
+import { createNebulosa } from './visualizers/Nebulosa.js';
 import { createControlPanel } from './ui/ControlPanel.js';
 import { createPresetManager } from './presets/PresetManager.js';
 import { PALETTES } from './color/palettes.js';
@@ -39,6 +40,7 @@ startBtn.addEventListener('click', async () => {
   renderer.register('bars', createSpectrumBars());
   renderer.register('particles', createParticles());
   renderer.register('tunnel', createTunnel3D());
+  renderer.register('nebulosa', createNebulosa());
   renderer.setActive(store.getState().pattern);
   renderer.start();
 

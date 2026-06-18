@@ -9,4 +9,8 @@ export const defaultState = {
   autoPalette: false,     // rotación automática de paleta
   autoPaletteMode: 'time',// 'time' | 'beat'
   flash: 0,               // pulso de flash 0..1 (decae solo)
+  // Feedback / trail loop (patrón Nebulosa)
+  trailScale: 1.02,       // zoom del frame anterior (>1 expande hacia afuera)
+  trailAlpha: 0.95,       // cuánto persiste el frame anterior (0..1)
+  trailRotate: 0.0,       // rotación sutil del trail por frame (rad)
 };
