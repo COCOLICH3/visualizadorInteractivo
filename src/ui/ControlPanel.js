@@ -24,6 +24,7 @@ export function createControlPanel(store, presetManager) {
     <label>Suavizado <input type="range" data-key="smoothing" min="0" max="0.95" step="0.05"></label>
     <label>Partículas <input type="range" data-key="particleCount" min="100" max="2000" step="50"></label>
     <label>Glow <input type="range" data-key="glow" min="0" max="3" step="0.1"></label>
+    <label>Distorsión <input type="range" data-key="displace" min="0" max="2" step="0.1"></label>
     <label><input type="checkbox" data-key="autoPalette"> Auto-paleta</label>
     <fieldset class="trail">
       <legend>Trail (Nebulosa)</legend>

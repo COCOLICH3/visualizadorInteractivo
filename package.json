@@ -15,6 +15,7 @@
   "dependencies": {
     "pixi-filters": "^6.1.5",
     "pixi.js": "^8.19.0",
+    "simplex-noise": "^4.0.3",
     "three": "^0.184.0"
   }
 }
