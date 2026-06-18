@@ -1,3 +1,4 @@
+import { AdvancedBloomFilter } from 'pixi-filters';
 import { PALETTES, colorAt } from '../color/palettes.js';
 
 // Nebulosa: visualizador con feedback/trail loop tipo Milkdrop.
@@ -19,6 +20,7 @@ export function createNebulosa() {
   let composite = null;      // [feedbackSprite, scene] -> se renderiza a RT
   let scene = null;          // elementos nuevos del frame
   let orbs = null;           // PIXI.Graphics donde se dibujan los orbes
+  let bloom = null;          // glow/bloom sobre los elementos nuevos
   let t = 0;
 
   function makeTextures(w, h) {
@@ -47,6 +49,16 @@ export function createNebulosa() {
       scene = new PIXI.Container();
       scene.addChild(orbs);
 
+      // Glow/bloom sobre los elementos nuevos: su brillo se integra al trail.
+      bloom = new AdvancedBloomFilter({
+        threshold: 0.3,
+        bloomScale: 1.2,
+        brightness: 1.0,
+        blur: 6,
+        quality: 4,
+      });
+      scene.filters = [bloom];
+
       composite = new PIXI.Container();
       composite.addChild(feedbackSprite);
       composite.addChild(scene);
@@ -72,6 +84,8 @@ export function createNebulosa() {
       const cx = w / 2;
       const cy = h / 2;
       const audio = (frame.bass + frame.energy) * 0.5 * state.sensitivity;
+      // El glow late con el slider y con la energía del audio.
+      bloom.bloomScale = 0.6 + state.glow * 1.4 + frame.energy * 0.6;
       const baseR = Math.min(w, h) * 0.18;
       for (let i = 0; i < ORB_COUNT; i++) {
         const ang = t * 0.6 + (i / ORB_COUNT) * Math.PI * 2;

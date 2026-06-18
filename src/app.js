@@ -1,4 +1,4 @@
-import * as PIXI from '../node_modules/pixi.js/dist/pixi.min.mjs';
+import * as PIXI from 'pixi.js';
 // PixiJS v8 es ESM: lo importamos como módulo y lo exponemos como global
 // para que los visualizadores puedan usar `PIXI.Container`, `PIXI.Graphics`, etc.
 window.PIXI = PIXI;
