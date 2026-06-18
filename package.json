@@ -4,9 +4,15 @@
   "description": "Spike: captura del audio del sistema (loopback) + espectro simple",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
-    "electron": "^31.7.7"
+    "electron": "^31.7.7",
+    "vitest": "^4.1.9"
+  },
+  "dependencies": {
+    "pixi.js": "^8.19.0"
   }
 }
