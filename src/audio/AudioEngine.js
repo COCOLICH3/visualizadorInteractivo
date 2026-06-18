@@ -12,6 +12,7 @@ export function createAudioEngine() {
   let analyser = null;
   let spectrum = null;
   let audioCtx = null;
+  let source = null;
   let sampleRate = 48000;
   const beatDetector = createBeatDetector({ debounceMs: 150 });
   // Smoothing asimétrico por banda: ataque rápido, caída lenta (tipo VU meter).
@@ -37,7 +38,7 @@ export function createAudioEngine() {
 
     audioCtx = new AudioContext();
     sampleRate = audioCtx.sampleRate;
-    const source = audioCtx.createMediaStreamSource(new MediaStream(audioTracks));
+    source = audioCtx.createMediaStreamSource(new MediaStream(audioTracks));
     analyser = audioCtx.createAnalyser();
     analyser.fftSize = 2048;
     analyser.smoothingTimeConstant = smoothing;
@@ -73,5 +74,14 @@ export function createAudioEngine() {
     for (const fn of listeners) fn(frame);
   }
 
-  return { start, setSmoothing, onFrame, tick };
+  // Exponen el contexto y el nodo de audio para integraciones que hacen su
+  // propio análisis (ej. Butterchurn/Milkdrop).
+  function getAudioContext() {
+    return audioCtx;
+  }
+  function getSource() {
+    return source;
+  }
+
+  return { start, setSmoothing, onFrame, tick, getAudioContext, getSource };
 }

@@ -13,6 +13,8 @@
     "vitest": "^4.1.9"
   },
   "dependencies": {
+    "butterchurn": "^2.6.7",
+    "butterchurn-presets": "^2.4.7",
     "pixi-filters": "^6.1.5",
     "pixi.js": "^8.19.0",
     "simplex-noise": "^4.0.3",

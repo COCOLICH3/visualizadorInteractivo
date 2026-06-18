@@ -13,6 +13,7 @@ export function createControlPanel(store, presetManager) {
         <option value="particles">Partículas</option>
         <option value="tunnel">Túnel 3D</option>
         <option value="nebulosa">Nebulosa</option>
+        <option value="milkdrop">Milkdrop (pro)</option>
       </select>
     </label>
     <label>Paleta
@@ -33,7 +34,7 @@ export function createControlPanel(store, presetManager) {
       <label>Persistencia <input type="range" data-key="trailAlpha" min="0.7" max="0.995" step="0.005"></label>
       <label>Rotación <input type="range" data-key="trailRotate" min="-0.02" max="0.02" step="0.001"></label>
     </fieldset>
-    <p class="hint">Atajos: [P] patrón · [C] paleta · [Espacio] flash · [F] fullscreen · [H] ocultar</p>
+    <p class="hint">Atajos: [P] patrón · [C] paleta · [Espacio] flash · [F] fullscreen · [H] ocultar<br>Milkdrop: [←] [→] cambiar preset · [R] preset al azar</p>
   `;
   document.body.appendChild(el);
 
@@ -57,7 +58,7 @@ export function createControlPanel(store, presetManager) {
 
   // Atajos de teclado.
   function cyclePattern() {
-    const order = ['bars', 'particles', 'tunnel', 'nebulosa'];
+    const order = ['bars', 'particles', 'tunnel', 'nebulosa', 'milkdrop'];
     const cur = store.getState().pattern;
     const next = order[(order.indexOf(cur) + 1) % order.length];
     store.setState({ pattern: next });
