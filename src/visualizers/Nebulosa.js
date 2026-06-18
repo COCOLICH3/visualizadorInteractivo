@@ -1,4 +1,4 @@
-import { AdvancedBloomFilter } from 'pixi-filters';
+import { AdvancedBloomFilter, RGBSplitFilter, ZoomBlurFilter } from 'pixi-filters';
 import { createNoise2D } from 'simplex-noise';
 import { PALETTES, colorAt } from '../color/palettes.js';
 
@@ -25,6 +25,10 @@ export function createNebulosa() {
   let dispSprite = null;     // textura de ruido que alimenta el displacement
   let dispFilter = null;     // distorsión del trail según el ruido + bajos
   let noiseTexture = null;
+  let rgbSplit = null;       // aberración cromática disparada en el beat
+  let zoomBlur = null;       // golpe de zoom radial disparado en el beat
+  let beatPulse = 0;         // 1 en cada beat, decae solo
+  let idleNoise = null;      // ruido para el movimiento idle (independiente del audio)
   let t = 0;
 
   function makeTextures(w, h) {
@@ -72,6 +76,8 @@ export function createNebulosa() {
       feedbackSprite = new PIXI.Sprite(rtCurrent);
       positionFeedback(w, h);
 
+      idleNoise = createNoise2D();
+
       orbs = new PIXI.Graphics();
       scene = new PIXI.Container();
       scene.addChild(orbs);
@@ -105,6 +111,19 @@ export function createNebulosa() {
       composite.addChild(scene);
 
       outSprite = new PIXI.Sprite(rtTarget);
+      // Golpes en el beat (solo sobre el frame mostrado, no se realimentan):
+      // zoom radial + aberración cromática que se disparan y decaen.
+      zoomBlur = new ZoomBlurFilter({
+        strength: 0,
+        center: { x: w / 2, y: h / 2 },
+        innerRadius: 100,
+      });
+      rgbSplit = new RGBSplitFilter({
+        red: { x: 0, y: 0 },
+        green: { x: 0, y: 0 },
+        blue: { x: 0, y: 0 },
+      });
+      outSprite.filters = [zoomBlur, rgbSplit];
       app.stage.addChild(outSprite);
     },
 
@@ -113,6 +132,17 @@ export function createNebulosa() {
       const h = app.screen.height;
       const palette = PALETTES[state.paletteIndex];
       t += 0.016;
+
+      // 0. Golpe en el beat: se dispara discreto y decae (no es continuo).
+      if (frame.beat) beatPulse = 1;
+      beatPulse *= 0.82;
+      const kick = beatPulse * state.beatKick;
+      zoomBlur.center = { x: w / 2, y: h / 2 };
+      zoomBlur.strength = kick * 0.4;
+      const off = kick * 16;
+      rgbSplit.red = { x: off, y: 0 };
+      rgbSplit.blue = { x: -off, y: 0 };
+      rgbSplit.green = { x: 0, y: off * 0.4 };
 
       // 1. Configurar la capa de feedback con el frame anterior.
       feedbackSprite.texture = rtCurrent;
@@ -134,13 +164,18 @@ export function createNebulosa() {
       const audio = (frame.bass + frame.energy) * 0.5 * state.sensitivity;
       // El glow late con el slider y con la energía del audio.
       bloom.bloomScale = 0.6 + state.glow * 1.4 + frame.energy * 0.6;
+      // Respiración global (independiente del audio): la escena nunca queda quieta.
+      const breathe = (idleNoise(t * 0.15, 0) + 1) * 0.5; // 0..1, lento
       const baseR = Math.min(w, h) * 0.18;
       for (let i = 0; i < ORB_COUNT; i++) {
         const ang = t * 0.6 + (i / ORB_COUNT) * Math.PI * 2;
-        const orbit = baseR * (1 + audio * 1.2);
-        const x = cx + Math.cos(ang) * orbit;
-        const y = cy + Math.sin(ang) * orbit;
-        const r = 10 + audio * 60 + frame.bass * 30 * state.sensitivity;
+        const orbit = baseR * (0.7 + breathe * 0.5 + audio * 1.2);
+        // Deambular orgánico por ruido: da vida aunque no haya sonido.
+        const wx = idleNoise(i * 5.1, t * 0.2) * 60;
+        const wy = idleNoise(t * 0.2, i * 5.1) * 60;
+        const x = cx + Math.cos(ang) * orbit + wx;
+        const y = cy + Math.sin(ang) * orbit + wy;
+        const r = 12 + breathe * 18 + audio * 60 + frame.bass * 30 * state.sensitivity;
         const color = colorAt(palette, i / ORB_COUNT);
         orbs.circle(x, y, r);
         orbs.fill({ color, alpha: 0.85 });
@@ -178,6 +213,10 @@ export function createNebulosa() {
       dispSprite = null;
       dispFilter = null;
       noiseTexture = null;
+      rgbSplit = null;
+      zoomBlur = null;
+      beatPulse = 0;
+      idleNoise = null;
       rtCurrent = null;
       rtTarget = null;
       feedbackSprite = null;

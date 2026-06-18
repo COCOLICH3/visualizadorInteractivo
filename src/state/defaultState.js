@@ -14,4 +14,5 @@ export const defaultState = {
   trailAlpha: 0.95,       // cuánto persiste el frame anterior (0..1)
   trailRotate: 0.0,       // rotación sutil del trail por frame (rad)
   displace: 0.5,          // intensidad de la distorsión por ruido (0..2)
+  beatKick: 1.0,          // intensidad del golpe (zoom + RGB split) en cada beat
 };
