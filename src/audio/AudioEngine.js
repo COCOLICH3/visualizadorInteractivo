@@ -13,6 +13,7 @@ export function createAudioEngine() {
   let spectrum = null;
   let audioCtx = null;
   let source = null;
+  let milkdropGain = null; // ganancia ajustable para la señal que recibe Milkdrop
   let sampleRate = 48000;
   const beatDetector = createBeatDetector({ debounceMs: 150 });
   // Smoothing asimétrico por banda: ataque rápido, caída lenta (tipo VU meter).
@@ -43,6 +44,10 @@ export function createAudioEngine() {
     analyser.fftSize = 2048;
     analyser.smoothingTimeConstant = smoothing;
     source.connect(analyser);
+    // Rama amplificable para Milkdrop (no afecta nuestro analyser ni el sonido).
+    milkdropGain = audioCtx.createGain();
+    milkdropGain.gain.value = 1.5;
+    source.connect(milkdropGain);
     spectrum = new Uint8Array(analyser.frequencyBinCount);
   }
 
@@ -82,6 +87,22 @@ export function createAudioEngine() {
   function getSource() {
     return source;
   }
+  // Nodo (con ganancia) que consume Milkdrop; y ajuste de esa ganancia en vivo.
+  function getMilkdropNode() {
+    return milkdropGain || source;
+  }
+  function setMilkdropGain(value) {
+    if (milkdropGain) milkdropGain.gain.value = value;
+  }
 
-  return { start, setSmoothing, onFrame, tick, getAudioContext, getSource };
+  return {
+    start,
+    setSmoothing,
+    onFrame,
+    tick,
+    getAudioContext,
+    getSource,
+    getMilkdropNode,
+    setMilkdropGain,
+  };
 }

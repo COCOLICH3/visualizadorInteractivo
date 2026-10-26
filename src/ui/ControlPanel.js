@@ -1,4 +1,5 @@
 import { PALETTES } from '../color/palettes.js';
+import { MILKDROP_FEATURED } from '../visualizers/Milkdrop.js';
 
 // Panel de control local: sliders, botones y atajos de teclado.
 // Todo muta el Store. El panel se puede ocultar con la tecla H.
@@ -13,7 +14,7 @@ export function createControlPanel(store, presetManager) {
         <option value="particles">Partículas</option>
         <option value="tunnel">Túnel 3D</option>
         <option value="nebulosa">Nebulosa</option>
-        <option value="milkdrop">Milkdrop (pro)</option>
+        ${MILKDROP_FEATURED.map((p, i) => `<option value="milkdrop:${i}">Milkdrop: ${p.label}</option>`).join('')}
       </select>
     </label>
     <label>Paleta
@@ -27,6 +28,7 @@ export function createControlPanel(store, presetManager) {
     <label>Glow <input type="range" data-key="glow" min="0" max="3" step="0.1"></label>
     <label>Distorsión <input type="range" data-key="displace" min="0" max="2" step="0.1"></label>
     <label>Golpe (beat) <input type="range" data-key="beatKick" min="0" max="2" step="0.1"></label>
+    <label>Sensib. Milkdrop <input type="range" data-key="milkdropGain" min="0.3" max="6" step="0.1"></label>
     <label><input type="checkbox" data-key="autoPalette"> Auto-paleta</label>
     <fieldset class="trail">
       <legend>Trail (Nebulosa)</legend>
@@ -43,15 +45,26 @@ export function createControlPanel(store, presetManager) {
   el.querySelectorAll('[data-key]').forEach((input) => {
     const key = input.dataset.key;
     if (input.type === 'checkbox') input.checked = state[key];
-    else input.value = state[key];
+    else if (key === 'pattern') {
+      input.value =
+        state.pattern === 'milkdrop' ? `milkdrop:${state.milkdropPreset}` : state.pattern;
+    } else input.value = state[key];
 
     input.addEventListener('input', () => {
+      // El selector de patrón maneja las entradas "milkdrop:idx" (preset destacado).
+      if (key === 'pattern') {
+        const v = input.value;
+        if (v.startsWith('milkdrop:')) {
+          store.setState({ pattern: 'milkdrop', milkdropPreset: Number(v.split(':')[1]) });
+        } else {
+          store.setState({ pattern: v });
+        }
+        return;
+      }
       let value;
       if (input.type === 'checkbox') value = input.checked;
       else if (input.type === 'range' || input.tagName === 'SELECT') value = Number(input.value);
       else value = input.value;
-      // pattern es string, no número:
-      if (key === 'pattern') value = input.value;
       store.setState({ [key]: value });
     });
   });
@@ -62,7 +75,8 @@ export function createControlPanel(store, presetManager) {
     const cur = store.getState().pattern;
     const next = order[(order.indexOf(cur) + 1) % order.length];
     store.setState({ pattern: next });
-    el.querySelector('[data-key="pattern"]').value = next;
+    const sel = el.querySelector('[data-key="pattern"]');
+    sel.value = next === 'milkdrop' ? `milkdrop:${store.getState().milkdropPreset}` : next;
   }
   function cyclePalette() {
     const cur = store.getState().paletteIndex;

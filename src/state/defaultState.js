@@ -15,4 +15,6 @@ export const defaultState = {
   trailRotate: 0.0,       // rotación sutil del trail por frame (rad)
   displace: 0.5,          // intensidad de la distorsión por ruido (0..2)
   beatKick: 1.0,          // intensidad del golpe (zoom + RGB split) en cada beat
+  milkdropPreset: 0,      // índice del preset destacado de Milkdrop (MILKDROP_FEATURED)
+  milkdropGain: 1.5,      // ganancia del audio que recibe Milkdrop (más = reacciona más)
 };
